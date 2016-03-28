@@ -1,0 +1,147 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.funwithmath.AddSubActivity" >
+
+    <ImageView
+        android:id="@+id/Welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp"
+        android:src="@drawable/pleasecalculate" />
+
+    <RelativeLayout
+        android:layout_width="250dp"
+        android:layout_height="270dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/frame" >
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="38dp"
+            android:ems="6"
+            android:hint="Answer here"
+            android:inputType="number" >
+
+            <requestFocus />
+        </EditText>
+        
+		<ImageView 
+            android:id="@+id/animationCH"  
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/animationch"/>   
+            
+        <ImageView 
+            android:id="@+id/animationCR"  
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/animationcr"/>
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/animationCH"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/blackline" />
+
+        <TextView
+            android:id="@+id/operator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/animationCH"
+            android:fontFamily="sans-serif-light"
+            android:text="+"
+            android:textColor="#000000"
+            android:textSize="55sp" />
+
+        <TextView
+            android:id="@+id/factor2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/input"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-light"
+            android:text="13"
+            android:textColor="#000000"
+            android:textSize="55sp" />
+
+        <TextView
+            android:id="@+id/factor1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/factor2"
+            android:layout_alignLeft="@+id/factor2"
+            android:fontFamily="sans-serif-light"
+            android:text="13"
+            android:textColor="#000000"
+            android:textSize="55sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+         >
+
+        <Button
+            android:id="@+id/ButtonSubmit"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/custom_button1"
+            android:onClick="Submit"
+            android:text="Submit" />
+        
+        <Button
+            android:id="@+id/ButtonReset"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/custom_button1"
+            android:onClick="Reset"
+            android:text="Reset" />
+    </RelativeLayout>
+
+<RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+         >
+    <ImageView
+        android:id="@+id/Correctness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/correctnessnew" />
+    
+    <TextView
+            android:id="@+id/CorrectPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:fontFamily="DroidSerif-BoldItalic"
+            android:text="Start"
+            android:textColor="#800000"
+            android:textSize="35sp" />
+    
+</RelativeLayout>
+
+</LinearLayout>

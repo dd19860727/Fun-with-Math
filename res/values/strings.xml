@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Fun with Math</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <color name="arc_blue">#10a679</color>
+    <color name="arc_red">#FE2E2E</color>
+
+
+</resources>

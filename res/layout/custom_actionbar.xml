@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@drawable/actionbar" >
+        
+    <TextView
+        android:id="@+id/title_textFun"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="130dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#E74C3C"
+        android:textStyle="bold" />
+     
+    <TextView
+        android:id="@+id/title_textWith"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#7D3C98"
+        android:textStyle="bold" />
+    
+    <TextView
+        android:id="@+id/title_textMath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         android:layout_marginStart="220dp"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#F4D03F"
+        android:textStyle="bold" />
+    
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/appicon" />
+
+</RelativeLayout>
