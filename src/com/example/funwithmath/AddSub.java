@@ -53,13 +53,17 @@ public class AddSub extends Activity {
 	private ImageView animationCR;
 	private AnimationDrawable animationDrawable;
 
+	private Button sound;
+	private Intent serviceIntent;
+	private boolean musicPlayStatus = true;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sub_main);
-		
-		//Initialize
+
+		// Initialize
 		textFactor1 = (TextView) findViewById(R.id.factor1);
 		textFactor2 = (TextView) findViewById(R.id.factor2);
 		operator = (TextView) findViewById(R.id.operator);
@@ -73,24 +77,39 @@ public class AddSub extends Activity {
 
 		right = 0;
 		wrong = 0;
-		
+
 		// Customize Action Bar
 		initActionBar();
-		
-		//Generate Operator
+
+		// Generate Operator
 		op = new OperatorGenerator();
 		operatorGen = op.operatorGenerator();
 		operatorGenerator(operatorGen);
-		
-		//Generate Number
+
+		// Generate Number
 		gM = new GenerateNum();
 		factArray = new int[numOfArray];
 		generateNum();
-		
-		//Convert Number to String
+
+		// Convert Number to String
 		fts = new FactToString();
 		sfactArray = new String[numOfArray];
 		factNumToStr();
+
+		sound = (Button) findViewById(R.id.sound);
+		serviceIntent = new Intent(this, MusicServer.class);
+
+		// Button to open or close music
+
+		sound.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				soundStopClick();
+			}
+		});
 
 		// Submit Button
 		Button submit;
@@ -106,17 +125,14 @@ public class AddSub extends Activity {
 				sinput = input.getText().toString();
 
 				if (operatorGen == 0) {
-					
-					//Check the answer of addition
+
+					// Check the answer of addition
 					checkAdd();
-					
 
 				} else {
-					
-					//Check the answer of substraction
+
+					// Check the answer of substraction
 					checkSub();
-
-
 
 				}
 
@@ -124,14 +140,14 @@ public class AddSub extends Activity {
 
 			private void checkSub() {
 				// TODO Auto-generated method stub
-				
+
 				if (!(sinput.isEmpty())) {
 
 					inputNum = Integer.parseInt(sinput);
 
 					if (inputNum == (factor1 - factor2)) {
-						
-						//animation of check mark
+
+						// animation of check mark
 						animationCheck();
 
 						input.setText("");
@@ -142,12 +158,12 @@ public class AddSub extends Activity {
 						factNumToStr();
 
 						right++;
-						//calculate correctness
+						// calculate correctness
 						displayPercent();
 
 					} else {
-						
-						//animation of cross mark
+
+						// animation of cross mark
 						animationCross();
 
 						input.setText("");
@@ -159,18 +175,18 @@ public class AddSub extends Activity {
 					}
 
 				}
-				
+
 			}
 
 			private void checkAdd() {
 				// TODO Auto-generated method stub
-				
+
 				if (!(sinput.isEmpty())) {
 
 					inputNum = Integer.parseInt(sinput);
 
 					if (inputNum == (factor1 + factor2)) {
-						
+
 						animationCheck();
 
 						input.setText("");
@@ -185,7 +201,7 @@ public class AddSub extends Activity {
 						displayPercent();
 
 					} else {
-						
+
 						animationCross();
 
 						wrong++;
@@ -195,26 +211,25 @@ public class AddSub extends Activity {
 					}
 
 				}
-				
+
 			}
 
 			private void animationCross() {
 				// TODO Auto-generated method stub
-				
+
 				animationCR.setImageResource(R.drawable.animationcr);
 				animationDrawable = (AnimationDrawable) animationCR.getDrawable();
 				animationDrawable.start();
-				
+
 			}
 
 			private void animationCheck() {
 				// TODO Auto-generated method stub
-				
+
 				animationCH.setImageResource(R.drawable.animationch);
 				animationDrawable = (AnimationDrawable) animationCH.getDrawable();
 				animationDrawable.start();
 
-				
 			}
 
 			private void displayPercent() {
@@ -261,9 +276,35 @@ public class AddSub extends Activity {
 
 	}
 
+	protected void soundStopClick() {
+		// TODO Auto-generated method stub
+		if (!musicPlayStatus) {
+			sound.setBackgroundResource(R.drawable.soundopen);
+			playAudio();
+			musicPlayStatus = true;
+		} else {
+			sound.setBackgroundResource(R.drawable.soundclose);
+			stopMyPlaySerive();
+			musicPlayStatus = false;
+		}
+	}
+
+	private void stopMyPlaySerive() {
+		// TODO Auto-generated method stub
+		stopService(serviceIntent);
+		musicPlayStatus = false;
+	}
+
+	private void playAudio() {
+		// TODO Auto-generated method stub
+		startService(serviceIntent);
+		musicPlayStatus = true;
+
+	}
+
 	private void initActionBar() {
 		// TODO Auto-generated method stub
-		
+
 		ActionBar mActionBar = getActionBar();
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setDisplayShowTitleEnabled(false);
@@ -281,19 +322,19 @@ public class AddSub extends Activity {
 
 		mActionBar.setCustomView(mCustomView);
 		mActionBar.setDisplayShowCustomEnabled(true);
-		
+
 	}
 
 	private void factNumToStr() {
 		// TODO Auto-generated method stub
-		
-		sfactArray = fts.factNumToStr(factor1,factor2);
+
+		sfactArray = fts.factNumToStr(factor1, factor2);
 		sfactor1 = sfactArray[0];
 		sfactor2 = sfactArray[1];
-		
+
 		textFactor1.setText(sfactor1);
 		textFactor2.setText(sfactor2);
-		
+
 	}
 
 	private void operatorGenerator(int operatorG) {
@@ -319,6 +360,5 @@ public class AddSub extends Activity {
 		factor2 = factArray[1];
 
 	}
-
 
 }

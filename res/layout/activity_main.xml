@@ -10,6 +10,20 @@
     android:background="@drawable/background"
     tools:context="com.example.funwithmath.MainActivity" >
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/sound"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/soundopen" />
+        
+    </RelativeLayout>
+
     <ImageView
         android:id="@+id/Welcome"
         android:layout_width="wrap_content"
@@ -23,8 +37,7 @@
         android:id="@+id/addSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-       android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
+       	android:layout_gravity="center_horizontal"
         android:background="@drawable/custom_button1"
         android:text="Add/Sub" />
 

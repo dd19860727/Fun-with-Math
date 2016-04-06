@@ -52,6 +52,10 @@ public class MultiDiv extends Activity {
 	private ImageView animationCH;
 	private ImageView animationCR;
 	private AnimationDrawable animationDrawable;
+	
+	private Button sound;
+	private Intent serviceIntent;
+	private boolean musicPlayStatus = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +95,21 @@ public class MultiDiv extends Activity {
 		fts = new FactToString();
 		sfactArray = new String[numOfArray];
 		factNumToStr();
+		
+		sound = (Button) findViewById(R.id.sound);
+		serviceIntent = new Intent(this, MusicServer.class);
+
+		// Button to open or close music
+
+		sound.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				soundStopClick();
+			}
+		});
 
 		// Submit Button
 		Button submit;
@@ -255,6 +274,31 @@ public class MultiDiv extends Activity {
 			}
 		});
 
+	}
+
+	protected void soundStopClick() {
+		// TODO Auto-generated method stub
+		if (!musicPlayStatus) {
+			sound.setBackgroundResource(R.drawable.soundopen);
+			playAudio();
+			musicPlayStatus = true;
+		} else {
+			sound.setBackgroundResource(R.drawable.soundclose);
+			stopMyPlaySerive();
+			musicPlayStatus = false;
+		}
+	}
+
+	private void stopMyPlaySerive() {
+		// TODO Auto-generated method stub
+		stopService(serviceIntent);
+		musicPlayStatus = false;
+	}
+
+	private void playAudio() {
+		// TODO Auto-generated method stub
+		startService(serviceIntent);
+		musicPlayStatus = true;
 	}
 
 	private void initActionBar() {

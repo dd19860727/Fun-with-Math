@@ -10,12 +10,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.funwithmath.AddSubActivity" >
 
-    <ImageView
-        android:id="@+id/WelcomeM"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-        android:src="@drawable/pleasecalculate" />
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/Welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="25dp"
+            android:src="@drawable/pleasecalculate" />
+
+        <Button
+            android:id="@+id/sound"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/soundopen" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="250dp"
@@ -36,20 +49,20 @@
 
             <requestFocus />
         </EditText>
-        
-		<ImageView 
-            android:id="@+id/animationCHM"  
+
+        <ImageView
+            android:id="@+id/animationCHM"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/animationch"/>   
-            
-        <ImageView 
-            android:id="@+id/animationCRM"  
+            android:src="@drawable/animationch" />
+
+        <ImageView
+            android:id="@+id/animationCRM"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/animationcr"/>
+            android:src="@drawable/animationcr" />
 
         <ImageView
             android:id="@+id/imageView1M"
@@ -60,11 +73,22 @@
             android:src="@drawable/blackline" />
 
         <TextView
+            android:id="@+id/operator2M"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/operatorM"
+            android:layout_toLeftOf="@+id/animationCHM"
+            android:fontFamily="sans-serif-light"
+            android:text="="
+            android:textColor="#000000"
+            android:textSize="33sp" />
+
+        <TextView
             android:id="@+id/factor3M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/factor2M"
-            android:layout_below="@+id/factor2M"
+            android:layout_above="@+id/operator2M"
+            android:layout_toRightOf="@+id/inputM"
             android:fontFamily="sans-serif-light"
             android:text="13"
             android:textColor="#000000"
@@ -74,8 +98,8 @@
             android:id="@+id/operator1M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/operatorM"
-            android:layout_toLeftOf="@+id/animationCHM"
+            android:layout_above="@+id/operator2M"
+            android:layout_alignRight="@+id/animationCHM"
             android:fontFamily="sans-serif-light"
             android:text="+"
             android:textColor="#000000"
@@ -85,19 +109,8 @@
             android:id="@+id/factor2M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/operator1M"
-            android:layout_alignRight="@+id/animationCHM"
-            android:fontFamily="sans-serif-light"
-            android:text="13"
-            android:textColor="#000000"
-            android:textSize="33sp" />
-
-        <TextView
-            android:id="@+id/factor1M"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/animationCHM"
-            android:layout_alignLeft="@+id/factor2M"
+            android:layout_above="@+id/operator2M"
+            android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif-light"
             android:text="13"
             android:textColor="#000000"
@@ -107,10 +120,22 @@
             android:id="@+id/operatorM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/inputM"
+            android:layout_alignLeft="@+id/animationCHM"
             android:layout_alignTop="@+id/animationCHM"
             android:fontFamily="sans-serif-light"
             android:text="+"
+            android:textColor="#000000"
+            android:textSize="33sp" />
+
+        <TextView
+            android:id="@+id/factor1M"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/operatorM"
+            android:layout_alignBottom="@+id/operatorM"
+            android:layout_toLeftOf="@+id/operator2M"
+            android:fontFamily="sans-serif-light"
+            android:text="13"
             android:textColor="#000000"
             android:textSize="33sp" />
 
@@ -118,8 +143,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-         >
+        android:layout_height="90dp" >
 
         <Button
             android:id="@+id/ButtonSubmitM"
@@ -130,7 +154,7 @@
             android:background="@drawable/custom_button1"
             android:onClick="Submit"
             android:text="Submit" />
-        
+
         <Button
             android:id="@+id/ButtonResetM"
             android:layout_width="120dp"
@@ -142,18 +166,18 @@
             android:text="Reset" />
     </RelativeLayout>
 
-<RelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-         >
-    <ImageView
-        android:id="@+id/CorrectnessM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:src="@drawable/correctnessnew" />
-    
-    <TextView
+        android:layout_height="70dp" >
+
+        <ImageView
+            android:id="@+id/CorrectnessM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/correctnessnew" />
+
+        <TextView
             android:id="@+id/CorrectPercentM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -163,7 +187,6 @@
             android:text="Start"
             android:textColor="#800000"
             android:textSize="35sp" />
-    
-</RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>
