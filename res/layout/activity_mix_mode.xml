@@ -35,6 +35,12 @@
         android:layout_height="270dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/frame" >
+        
+        <android.gesture.GestureOverlayView
+			android:id="@+id/himi_gestureM" android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:layout_weight="1.0"
+			android:gestureColor="#0101DF"
+			/>
 
         <EditText
             android:id="@+id/inputM"

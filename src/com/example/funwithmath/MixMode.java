@@ -6,14 +6,24 @@
 
 package com.example.funwithmath;
 
+import java.util.List;
+import java.util.Set;
+
 import android.R.layout;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
+import android.gesture.GestureOverlayView.OnGestureListener;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,10 +60,17 @@ public class MixMode extends Activity {
 	private ImageView animationCH;
 	private ImageView animationCR;
 	private AnimationDrawable animationDrawable;
-	
+
 	private Button sound;
 	private Intent serviceIntent;
 	private boolean musicPlayStatus = true;
+
+	private GestureOverlayView gov;
+	private Gesture gesture;
+	private GestureLibrary gestureLib;
+	private String temp;
+	private String temp1;
+	private Boolean checTemp;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +107,57 @@ public class MixMode extends Activity {
 
 		// Convert Number to String
 		factNumToStr();
-		
+
 		sound = (Button) findViewById(R.id.sound);
 		serviceIntent = new Intent(this, MusicServer.class);
+
+		gov = (GestureOverlayView) findViewById(R.id.himi_gestureM);
+		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
+		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+		checTemp = true;
+
+		// Gesture Recognition
+		gov.addOnGestureListener(new OnGestureListener() {
+			@Override
+
+			public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
+
+			}
+
+			@Override
+
+			public void onGestureEnded(GestureOverlayView overlay, MotionEvent event) {
+				gesture = overlay.getGesture();
+
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+
+					addMyGesture(gesture);
+
+					if (gesture.getStrokesCount() == 2) {
+
+						clearGesture();
+
+					}
+
+				}
+
+			}
+
+			@Override
+			public void onGestureCancelled(GestureOverlayView overlay, MotionEvent event) {
+			}
+
+			@Override
+			public void onGesture(GestureOverlayView overlay, MotionEvent event) {
+			}
+		});
+
+		if (!gestureLib.load()) {
+
+		} else {
+			Set<String> set = gestureLib.getGestureEntries();
+			Object ob[] = set.toArray();
+		}
 
 		// Button to open or close music
 
@@ -137,6 +202,8 @@ public class MixMode extends Activity {
 				} else {
 					check4();
 				}
+				
+				temp = "";
 
 			}
 
@@ -351,6 +418,87 @@ public class MixMode extends Activity {
 			}
 		});
 
+	}
+
+	protected void addMyGesture(Gesture gesture2) {
+		// TODO Auto-generated method stub
+		try {
+
+			findGesture(gesture2);
+
+			} catch (Exception e) {
+		}
+	}
+
+	private void findGesture(Gesture gesture2) {
+		// TODO Auto-generated method stub
+		try {
+
+
+			List<Prediction> predictions = gestureLib.recognize(gesture);
+
+			if (!predictions.isEmpty()) {
+				Prediction prediction = predictions.get(0);
+
+				if (prediction.score >= 1) {
+				
+					
+					if(prediction.name.equals("10")){
+						
+					temp1 =	removSec("1");
+						
+					}else if (prediction.name.equals("11")) {
+						temp1 =	removSec("8");
+
+					}else if (prediction.name.equals("4")) {
+						temp1 =	removSec("4");
+
+					}else if (prediction.name.equals("5")){
+						temp1 =	removSec("5");
+
+					}else {
+						temp1 = prediction.name;
+						clearGesture();
+					}
+					
+					temp = temp+temp1;
+					temp = temp.replace("null", "");
+					
+					input.setText(temp);
+					
+				}
+			}
+
+		
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	}
+
+	private String removSec(String temp) {
+		// TODO Auto-generated method stub
+		if(checTemp == true){
+			temp = temp;
+			checTemp = false;
+		}else{
+			temp = "";
+			checTemp = true;
+		}
+		
+		return temp;
+	}
+
+	private void clearGesture() {
+		// TODO Auto-generated method stub
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		gov.cancelClearAnimation();
+		gov.clear(true);
 	}
 
 	protected void soundStopClick() {
