@@ -42,19 +42,19 @@
 			android:gestureColor="#0101DF"
 			/>
 
-        <EditText
+         <com.example.funwithmath.ClearableEditText
             android:id="@+id/input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="38dp"
-            android:ems="6"
-            android:hint="Answer here"
+            android:ems="6"  
+            android:hint="Answer here"        
             android:inputType="number" >
 
             <requestFocus />
-        </EditText>
+        </com.example.funwithmath.ClearableEditText>
 
         <ImageView
             android:id="@+id/animationCH"

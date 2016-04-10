@@ -20,6 +20,7 @@ import android.gesture.GestureOverlayView;
 import android.gesture.Prediction;
 import android.gesture.GestureOverlayView.OnGestureListener;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ public class MultiDiv extends Activity {
 	private TextView operator;
 	private int operatorGen;
 
-	private EditText input;
+	private ClearableEditText input;
 	private String sinput;
 	private int inputNum;
 
@@ -70,9 +71,12 @@ public class MultiDiv extends Activity {
 	private GestureOverlayView gov;
 	private Gesture gesture;
 	private GestureLibrary gestureLib;
-	private String temp;
+	public static String temp;
 	private String temp1;
 	private Boolean checTemp;
+	
+	private MediaPlayer mpRight;
+	private MediaPlayer mpWrong;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,7 @@ public class MultiDiv extends Activity {
 		textFactor2 = (TextView) findViewById(R.id.factor2);
 		operator = (TextView) findViewById(R.id.operator);
 
-		input = (EditText) findViewById(R.id.input);
+		input = (ClearableEditText) findViewById(R.id.input);
 
 		animationCH = (ImageView) findViewById(R.id.animationCH);
 		animationCR = (ImageView) findViewById(R.id.animationCR);
@@ -115,6 +119,10 @@ public class MultiDiv extends Activity {
 
 		sound = (Button) findViewById(R.id.sound);
 		serviceIntent = new Intent(this, MusicServer.class);
+		
+		//Correct Wrong Sound Effect
+		mpRight = MediaPlayer.create(getApplicationContext(), R.raw.correct);
+		mpWrong = MediaPlayer.create(getApplicationContext(), R.raw.wrong);
 
 		gov = (GestureOverlayView) findViewById(R.id.himi_gesture);
 		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
@@ -287,6 +295,7 @@ public class MultiDiv extends Activity {
 				animationCR.setImageResource(R.drawable.animationcr);
 				animationDrawable = (AnimationDrawable) animationCR.getDrawable();
 				animationDrawable.start();
+				mpWrong.start();
 
 			}
 
@@ -296,6 +305,7 @@ public class MultiDiv extends Activity {
 				animationCH.setImageResource(R.drawable.animationch);
 				animationDrawable = (AnimationDrawable) animationCH.getDrawable();
 				animationDrawable.start();
+				mpRight.start();
 
 			}
 
@@ -386,7 +396,9 @@ public class MultiDiv extends Activity {
 					temp = temp + temp1;
 					temp = temp.replace("null", "");
 
-					input.setText(temp);
+
+						input.setText(temp);
+
 
 				}
 			}

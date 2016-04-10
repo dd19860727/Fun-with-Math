@@ -42,7 +42,7 @@
 			android:gestureColor="#0101DF"
 			/>
 
-        <EditText
+        <com.example.funwithmath.ClearableEditText
             android:id="@+id/inputM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:inputType="number" >
 
             <requestFocus />
-        </EditText>
+        </com.example.funwithmath.ClearableEditText>
 
         <ImageView
             android:id="@+id/animationCHM"
