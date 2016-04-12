@@ -6,6 +6,7 @@
 
 package com.example.funwithmath;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,9 @@ import android.gesture.GestureOverlayView.OnGestureListener;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,8 +35,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MixMode extends Activity {
+public class MixMode extends Activity implements RecognitionListener {
 
 	private TextView textFactor1;
 	private TextView textFactor2;
@@ -72,9 +77,12 @@ public class MixMode extends Activity {
 	public static String temp;
 	private String temp1;
 	private Boolean checTemp;
-	
+
 	private MediaPlayer mpRight;
 	private MediaPlayer mpWrong;
+
+	private Button mic;
+	private SpeechRecognizer speech;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,12 +120,17 @@ public class MixMode extends Activity {
 		// Convert Number to String
 		factNumToStr();
 
-		sound = (Button) findViewById(R.id.sound);
+		sound = (Button) findViewById(R.id.soundM);
 		serviceIntent = new Intent(this, MusicServer.class);
-		
-		//Correct Wrong Sound Effect
+
+		// Correct Wrong Sound Effect
 		mpRight = MediaPlayer.create(getApplicationContext(), R.raw.correct);
 		mpWrong = MediaPlayer.create(getApplicationContext(), R.raw.wrong);
+
+		// Speaker Icon
+		mic = (Button) findViewById(R.id.voiceRecogM);
+		speech = SpeechRecognizer.createSpeechRecognizer(this);
+		speech.setRecognitionListener(this);
 
 		gov = (GestureOverlayView) findViewById(R.id.himi_gestureM);
 		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
@@ -166,6 +179,24 @@ public class MixMode extends Activity {
 			Set<String> set = gestureLib.getGestureEntries();
 			Object ob[] = set.toArray();
 		}
+		
+		//Voice Recognition
+		mic.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				if (musicPlayStatus) {
+					sound.setBackgroundResource(R.drawable.soundclose);
+					stopMyPlaySerive();
+					musicPlayStatus = false;
+				} 
+				
+				promptSpeechInput();
+				
+			}
+		});
 
 		// Button to open or close music
 
@@ -210,7 +241,7 @@ public class MixMode extends Activity {
 				} else {
 					check4();
 				}
-				
+
 				temp = "";
 
 			}
@@ -430,13 +461,23 @@ public class MixMode extends Activity {
 
 	}
 
+	protected void promptSpeechInput() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
+		intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+
+		speech.startListening(intent);
+		
+	}
+
 	protected void addMyGesture(Gesture gesture2) {
 		// TODO Auto-generated method stub
 		try {
 
 			findGesture(gesture2);
 
-			} catch (Exception e) {
+		} catch (Exception e) {
 		}
 	}
 
@@ -444,60 +485,54 @@ public class MixMode extends Activity {
 		// TODO Auto-generated method stub
 		try {
 
-
 			List<Prediction> predictions = gestureLib.recognize(gesture);
 
 			if (!predictions.isEmpty()) {
 				Prediction prediction = predictions.get(0);
 
 				if (prediction.score >= 1) {
-				
-					
-					if(prediction.name.equals("10")){
-						
-					temp1 =	removSec("1");
-						
-					}else if (prediction.name.equals("11")) {
-						temp1 =	removSec("8");
 
-					}else if (prediction.name.equals("4")) {
-						temp1 =	removSec("4");
+					if (prediction.name.equals("10")) {
 
-					}else if (prediction.name.equals("5")){
-						temp1 =	removSec("5");
+						temp1 = removSec("1");
 
-					}else {
+					} else if (prediction.name.equals("11")) {
+						temp1 = removSec("8");
+
+					} else if (prediction.name.equals("4")) {
+						temp1 = removSec("4");
+
+					} else if (prediction.name.equals("5")) {
+						temp1 = removSec("5");
+
+					} else {
 						temp1 = prediction.name;
 						clearGesture();
 					}
-					
-					temp = temp+temp1;
+
+					temp = temp + temp1;
 					temp = temp.replace("null", "");
-					
 
-						input.setText(temp);
+					input.setText(temp);
 
-					
 				}
 			}
 
-		
-
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private String removSec(String temp) {
 		// TODO Auto-generated method stub
-		if(checTemp == true){
+		if (checTemp == true) {
 			temp = temp;
 			checTemp = false;
-		}else{
+		} else {
 			temp = "";
 			checTemp = true;
 		}
-		
+
 		return temp;
 	}
 
@@ -719,6 +754,65 @@ public class MixMode extends Activity {
 
 		}
 
+	}
+
+	@Override
+	public void onReadyForSpeech(Bundle params) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onBeginningOfSpeech() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRmsChanged(float rmsdB) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onBufferReceived(byte[] buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEndOfSpeech() {
+		// TODO Auto-generated method stub
+		Toast.makeText(getApplicationContext(),
+				getString(R.string.end_of_speech),
+				Toast.LENGTH_SHORT).show();
+		
+	}
+
+	@Override
+	public void onError(int error) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onResults(Bundle data) {
+		// TODO Auto-generated method stub
+		ArrayList<String> result = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+		input.setText(result.get(0));
+		
+	}
+
+	@Override
+	public void onPartialResults(Bundle partialResults) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEvent(int eventType, Bundle params) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

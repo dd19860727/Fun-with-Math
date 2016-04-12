@@ -6,12 +6,15 @@
 
 package com.example.funwithmath;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import android.R.layout;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
@@ -24,6 +27,9 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,10 +37,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class AddSub extends Activity {
+
+public class AddSub extends Activity implements RecognitionListener {
 
 	private TextView textFactor1;
 	private TextView textFactor2;
@@ -69,16 +78,19 @@ public class AddSub extends Activity {
 	private Button sound;
 	private Intent serviceIntent;
 	private boolean musicPlayStatus = true;
-	
+
 	private GestureOverlayView gov;
 	private Gesture gesture;
 	private GestureLibrary gestureLib;
 	public static String temp;
 	private String temp1;
 	private Boolean checTemp;
-	
+
 	private MediaPlayer mpRight;
 	private MediaPlayer mpWrong;
+
+	private Button mic;
+	private SpeechRecognizer speech;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +104,7 @@ public class AddSub extends Activity {
 		operator = (TextView) findViewById(R.id.operator);
 
 		input = (ClearableEditText) findViewById(R.id.input);
-	
+
 		animationCH = (ImageView) findViewById(R.id.animationCH);
 		animationCR = (ImageView) findViewById(R.id.animationCR);
 
@@ -121,22 +133,27 @@ public class AddSub extends Activity {
 
 		sound = (Button) findViewById(R.id.sound);
 		serviceIntent = new Intent(this, MusicServer.class);
-		
-		//Correct Wrong Sound Effect
+
+		// Correct Wrong Sound Effect
 		mpRight = MediaPlayer.create(getApplicationContext(), R.raw.correct);
 		mpWrong = MediaPlayer.create(getApplicationContext(), R.raw.wrong);
-		
+
+		// Speaker Icon
+		mic = (Button) findViewById(R.id.voiceRecog);
+		speech = SpeechRecognizer.createSpeechRecognizer(this);
+		speech.setRecognitionListener(this);
+
 		gov = (GestureOverlayView) findViewById(R.id.himi_gesture);
 		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
 		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
 		checTemp = true;
-		
+
 		// Gesture Recognition
 		gov.addOnGestureListener(new OnGestureListener() {
 			@Override
 
 			public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
-				
+
 			}
 
 			@Override
@@ -145,20 +162,17 @@ public class AddSub extends Activity {
 				gesture = overlay.getGesture();
 
 				if (event.getAction() == MotionEvent.ACTION_UP) {
-						
-					
-							addMyGesture(gesture);
-							
-							 if (gesture.getStrokesCount() == 2) {
-								 
-								clearGesture();
-								 
-							 }
-							
-					
-					
+
+					addMyGesture(gesture);
+
+					if (gesture.getStrokesCount() == 2) {
+
+						clearGesture();
+
+					}
+
 				}
-				
+
 			}
 
 			@Override
@@ -169,13 +183,31 @@ public class AddSub extends Activity {
 			public void onGesture(GestureOverlayView overlay, MotionEvent event) {
 			}
 		});
-		
+
 		if (!gestureLib.load()) {
-			
+
 		} else {
 			Set<String> set = gestureLib.getGestureEntries();
 			Object ob[] = set.toArray();
 		}
+
+		// Voice Recognition
+		mic.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				if (musicPlayStatus) {
+					sound.setBackgroundResource(R.drawable.soundclose);
+					stopMyPlaySerive();
+					musicPlayStatus = false;
+				}
+
+				promptSpeechInput();
+
+			}
+		});
 
 		// Button to open or close music
 
@@ -201,7 +233,6 @@ public class AddSub extends Activity {
 				// TODO Auto-generated method stub
 
 				sinput = input.getText().toString();
-				
 
 				if (operatorGen == 0) {
 
@@ -214,7 +245,7 @@ public class AddSub extends Activity {
 					checkSub();
 
 				}
-				
+
 				temp = "";
 
 			}
@@ -276,8 +307,6 @@ public class AddSub extends Activity {
 						operatorGenerator(operatorGen);
 						generateNum();
 						factNumToStr();
-						
-						
 
 						right++;
 
@@ -313,7 +342,7 @@ public class AddSub extends Activity {
 				animationCH.setImageResource(R.drawable.animationch);
 				animationDrawable = (AnimationDrawable) animationCH.getDrawable();
 				animationDrawable.start();
-				
+
 				mpRight.start();
 
 			}
@@ -362,19 +391,29 @@ public class AddSub extends Activity {
 
 	}
 
-	protected void clearGesture() {
+	protected void promptSpeechInput() {
 		// TODO Auto-generated method stub
-		 try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			gov.cancelClearAnimation();
-			gov.clear(true);
-		
+
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
+		intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+
+		speech.startListening(intent);
+
 	}
 
+	protected void clearGesture() {
+		// TODO Auto-generated method stub
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		gov.cancelClearAnimation();
+		gov.clear(true);
+
+	}
 
 	protected void addMyGesture(Gesture gesture2) {
 		// TODO Auto-generated method stub
@@ -382,79 +421,71 @@ public class AddSub extends Activity {
 
 			findGesture(gesture2);
 
-			} catch (Exception e) {
+		} catch (Exception e) {
 		}
 	}
 
 	private void findGesture(Gesture gesture2) {
 		// TODO Auto-generated method stub
-		
+
 		try {
 
+			List<Prediction> predictions = gestureLib.recognize(gesture);
 
-				List<Prediction> predictions = gestureLib.recognize(gesture);
+			if (!predictions.isEmpty()) {
+				Prediction prediction = predictions.get(0);
 
-				if (!predictions.isEmpty()) {
-					Prediction prediction = predictions.get(0);
+				if (prediction.score >= 1) {
 
-					if (prediction.score >= 1) {
-					
-						
-						if(prediction.name.equals("10")){
-							
-						temp1 =	removSec("1");
-							
-						}else if (prediction.name.equals("11")) {
-							temp1 =	removSec("8");
+					if (prediction.name.equals("10")) {
 
-						}else if (prediction.name.equals("4")) {
-							temp1 =	removSec("4");
+						temp1 = removSec("1");
 
-						}else if (prediction.name.equals("5")){
-							temp1 =	removSec("5");
+					} else if (prediction.name.equals("11")) {
+						temp1 = removSec("8");
 
-						}else {
-							temp1 = prediction.name;
-							clearGesture();
-						}
-						
-						temp = temp+temp1;
-						temp = temp.replace("null", "");
-						
-						
+					} else if (prediction.name.equals("4")) {
+						temp1 = removSec("4");
 
-							input.setText(temp);
-	
-						
-						
+					} else if (prediction.name.equals("5")) {
+						temp1 = removSec("5");
+
+					} else {
+						temp1 = prediction.name;
+						clearGesture();
 					}
-				}
 
-			
+					temp = temp + temp1;
+					temp = temp.replace("null", "");
+
+					input.setText(temp);
+
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private String removSec(String temp) {
 		// TODO Auto-generated method stub
-		
-		if(checTemp == true){
+
+		if (checTemp == true) {
 			temp = temp;
 			checTemp = false;
-		}else{
+		} else {
 			temp = "";
 			checTemp = true;
 		}
-		
+
 		return temp;
 	}
 
 	private void specialCondition() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	protected void soundStopClick() {
@@ -539,6 +570,67 @@ public class AddSub extends Activity {
 		factArray = gM.generateNum(factor1, factor2, operatorGen);
 		factor1 = factArray[0];
 		factor2 = factArray[1];
+
+	}
+
+	@Override
+	public void onReadyForSpeech(Bundle params) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onBeginningOfSpeech() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onRmsChanged(float rmsdB) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onBufferReceived(byte[] buffer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onEndOfSpeech() {
+		// TODO Auto-generated method stub
+		Toast.makeText(getApplicationContext(),
+				getString(R.string.end_of_speech),
+				Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onError(int error) {
+		// TODO Auto-generated method stub
+		
+		
+
+	}
+
+	@Override
+	public void onResults(Bundle data) {
+		// TODO Auto-generated method stub
+
+		ArrayList<String> result = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+		input.setText(result.get(0));
+
+	}
+
+	@Override
+	public void onPartialResults(Bundle partialResults) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onEvent(int eventType, Bundle params) {
+		// TODO Auto-generated method stub
 
 	}
 

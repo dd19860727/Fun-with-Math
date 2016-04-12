@@ -22,11 +22,19 @@
             android:src="@drawable/pleasecalculate" />
 
         <Button
-            android:id="@+id/sound"
+            android:id="@+id/voiceRecog"
             android:layout_width="51dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@drawable/soundopen" />
+            android:background="@drawable/icon_voi" />
+
+         <Button
+             android:id="@+id/sound"
+             android:layout_width="51dp"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:layout_toLeftOf="@+id/voiceRecog"
+             android:background="@drawable/soundopen" />
 
     </RelativeLayout>
 

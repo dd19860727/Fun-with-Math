@@ -6,6 +6,7 @@
 
 package com.example.funwithmath;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,9 @@ import android.gesture.GestureOverlayView.OnGestureListener;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,8 +35,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MultiDiv extends Activity {
+public class MultiDiv extends Activity implements RecognitionListener {
 
 	private TextView textFactor1;
 	private TextView textFactor2;
@@ -77,6 +82,9 @@ public class MultiDiv extends Activity {
 	
 	private MediaPlayer mpRight;
 	private MediaPlayer mpWrong;
+	
+	private Button mic;
+	private SpeechRecognizer speech;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +131,11 @@ public class MultiDiv extends Activity {
 		//Correct Wrong Sound Effect
 		mpRight = MediaPlayer.create(getApplicationContext(), R.raw.correct);
 		mpWrong = MediaPlayer.create(getApplicationContext(), R.raw.wrong);
+		
+		//Speaker Icon
+		mic = (Button) findViewById(R.id.voiceRecog);
+		speech = SpeechRecognizer.createSpeechRecognizer(this);
+	    speech.setRecognitionListener(this);
 
 		gov = (GestureOverlayView) findViewById(R.id.himi_gesture);
 		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
@@ -171,6 +184,24 @@ public class MultiDiv extends Activity {
 			Set<String> set = gestureLib.getGestureEntries();
 			Object ob[] = set.toArray();
 		}
+		
+		//Voice Recognition
+		mic.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				if (musicPlayStatus) {
+					sound.setBackgroundResource(R.drawable.soundclose);
+					stopMyPlaySerive();
+					musicPlayStatus = false;
+				} 
+				
+				promptSpeechInput();
+				
+			}
+		});
 
 		// Button to open or close music
 
@@ -351,6 +382,16 @@ public class MultiDiv extends Activity {
 			}
 		});
 
+	}
+
+	protected void promptSpeechInput() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
+		intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+
+		speech.startListening(intent);
+		
 	}
 
 	protected void addMyGesture(Gesture gesture2) {
@@ -544,6 +585,65 @@ public class MultiDiv extends Activity {
 
 		}
 
+	}
+
+	@Override
+	public void onReadyForSpeech(Bundle params) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onBeginningOfSpeech() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRmsChanged(float rmsdB) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onBufferReceived(byte[] buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEndOfSpeech() {
+		// TODO Auto-generated method stub
+		Toast.makeText(getApplicationContext(),
+				getString(R.string.end_of_speech),
+				Toast.LENGTH_SHORT).show();
+		
+	}
+
+	@Override
+	public void onError(int error) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onResults(Bundle data) {
+		// TODO Auto-generated method stub
+		ArrayList<String> result = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+		input.setText(result.get(0));
+		
+	}
+
+	@Override
+	public void onPartialResults(Bundle partialResults) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEvent(int eventType, Bundle params) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
