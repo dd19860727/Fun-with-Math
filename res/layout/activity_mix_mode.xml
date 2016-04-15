@@ -9,34 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.funwithmath.AddSubActivity" >
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <ImageView
-            android:id="@+id/Welcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="25dp"
-            android:src="@drawable/pleasecalculate" />
-
-       <Button
-            android:id="@+id/voiceRecogM"
-            android:layout_width="51dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/icon_voi" />
-
-         <Button
-             android:id="@+id/soundM"
-             android:layout_width="51dp"
-             android:layout_height="wrap_content"
-             android:layout_alignParentTop="true"
-             android:layout_toLeftOf="@+id/voiceRecogM"
-             android:background="@drawable/soundopen" />
-
-    </RelativeLayout>
+    
+    <include layout="@layout/toplayout"  android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
     <RelativeLayout
         android:layout_width="250dp"
@@ -50,7 +24,7 @@
 			android:gestureColor="#0101DF"
 			/>
 
-        <com.example.funwithmath.ClearableEditText
+        <com.example.funwithmath.widget.ClearableEditText
             android:id="@+id/inputM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +36,7 @@
             android:inputType="number" >
 
             <requestFocus />
-        </com.example.funwithmath.ClearableEditText>
+        </com.example.funwithmath.widget.ClearableEditText>
 
         <ImageView
             android:id="@+id/animationCHM"
@@ -155,52 +129,9 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="90dp" >
+   <include layout="@layout/button"  android:layout_width="match_parent" android:layout_height="90dp"/>
 
-        <Button
-            android:id="@+id/ButtonSubmitM"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/custom_button1"
-            android:onClick="Submit"
-            android:text="Submit" />
+   <include layout="@layout/correctness"  android:layout_width="match_parent" android:layout_height="70dp"/>
 
-        <Button
-            android:id="@+id/ButtonResetM"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/custom_button1"
-            android:onClick="Reset"
-            android:text="Reset" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="70dp" >
-
-        <ImageView
-            android:id="@+id/CorrectnessM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/correctnessnew" />
-
-        <TextView
-            android:id="@+id/CorrectPercentM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:fontFamily="DroidSerif-BoldItalic"
-            android:text="Start"
-            android:textColor="#800000"
-            android:textSize="35sp" />
-    </RelativeLayout>
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.example.funwithmath;
+package com.example.funwithmath.widget;
 
 /**
  * Copyright 2016 Alex Yanchenko
@@ -18,8 +18,10 @@ package com.example.funwithmath;
 
 import static com.example.funwithmath.util.Strings.isNotEmpty;
 
-import com.example.funwithmath.adapter.widget.TextWatcherAdapter;
-import com.example.funwithmath.adapter.widget.TextWatcherAdapter.TextWatcherListener;
+import com.example.funwithmath.AddSub;
+import com.example.funwithmath.MixMode;
+import com.example.funwithmath.MultiDiv;
+import com.example.funwithmath.widget.TextWatcherAdapter.TextWatcherListener;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -139,7 +141,6 @@ public class ClearableEditText extends EditText implements OnTouchListener, OnFo
 		}
 	}
 
-	@Override
 	public void onTextChanged(EditText view, String text) {
 		if (isFocused()) {
 			setClearIconVisible(isNotEmpty(text));

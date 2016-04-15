@@ -1,4 +1,7 @@
-package com.example.funwithmath;
+package com.example.funwithmath.util;
+
+import com.example.funwithmath.R;
+import com.example.funwithmath.R.raw;
 
 import android.app.Service;
 import android.content.Intent;

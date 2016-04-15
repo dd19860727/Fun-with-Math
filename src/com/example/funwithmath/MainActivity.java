@@ -12,27 +12,27 @@
 
 package com.example.funwithmath;
 
-import android.app.ActionBar;
+import com.example.funwithmath.util.MusicController;
+import com.example.funwithmath.util.MusicServer;
+import com.example.funwithmath.widget.CustomActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+	private CustomActionBar cActionBar;
 
 	private Button addSubButton;
 	private Button multiDivButton;
 	private Button mixMode;
+
 	private Button sound;
 	private Intent serviceIntent;
+	private MusicController musiControl;
 	private boolean musicPlayStatus = true;
 
 	@Override
@@ -40,19 +40,23 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		addSubButton = (Button) findViewById(R.id.addSub);
-		multiDivButton = (Button) findViewById(R.id.mutiDiv);
-		mixMode = (Button) findViewById(R.id.mixmode);
+		// Customize Action Bar
+		cActionBar = new CustomActionBar(getActionBar());
+		cActionBar.initActionBar();
+		cActionBar.cutomLayoutInflater(this);
+		cActionBar.display();
+
+		// Control Background Music
 		sound = (Button) findViewById(R.id.sound);
 		sound.setBackgroundResource(R.drawable.soundopen);
 		serviceIntent = new Intent(this, MusicServer.class);
-
-		// Customize Action Bar
-		initActionBar();
-		
-		//Start Music
-		startService(serviceIntent);
+		musiControl = new MusicController(this, serviceIntent);
+		musiControl.startMusic();
 		musicPlayStatus = true;
+
+		addSubButton = (Button) findViewById(R.id.addSub);
+		multiDivButton = (Button) findViewById(R.id.mutiDiv);
+		mixMode = (Button) findViewById(R.id.mixmode);
 
 		// Button to open or close music
 
@@ -61,8 +65,15 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
-				soundStopClick();
+
+				if (!musicPlayStatus) {
+					musiControl.soundSwitch(sound, musicPlayStatus);
+					musicPlayStatus = true;
+				} else {
+					musiControl.soundSwitch(sound, musicPlayStatus);
+					musicPlayStatus = false;
+				}
+
 			}
 		});
 
@@ -107,57 +118,9 @@ public class MainActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		
-		stopService(serviceIntent);
+
+		musiControl.stopMyPlaySerive();
 		musicPlayStatus = false;
-		
-	}
-
-	private void soundStopClick() {
-		// TODO Auto-generated method stub
-		if (!musicPlayStatus) {
-			sound.setBackgroundResource(R.drawable.soundopen);
-			playAudio();
-			musicPlayStatus = true;
-		} else {
-			sound.setBackgroundResource(R.drawable.soundclose);
-			stopMyPlaySerive();
-			musicPlayStatus = false;
-		}
-	}
-
-	private void stopMyPlaySerive() {
-		// TODO Auto-generated method stub
-		stopService(serviceIntent);
-		musicPlayStatus = false;
-	}
-
-	private void playAudio() {
-		// TODO Auto-generated method stub
-		startService(serviceIntent);
-		musicPlayStatus = true;
-	}
-
-	private void initActionBar() {
-		// TODO Auto-generated method stub
-
-		ActionBar mActionBar = getActionBar();
-		mActionBar.setDisplayShowHomeEnabled(false);
-		mActionBar.setDisplayShowTitleEnabled(false);
-		LayoutInflater mInflater = LayoutInflater.from(this);
-
-		View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-		TextView mTitleTextViewFun = (TextView) mCustomView.findViewById(R.id.title_textFun);
-		mTitleTextViewFun.setText("Fun");
-
-		TextView mTitleTextViewWith = (TextView) mCustomView.findViewById(R.id.title_textWith);
-		mTitleTextViewWith.setText("with");
-
-		TextView mTitleTextViewMath = (TextView) mCustomView.findViewById(R.id.title_textMath);
-		mTitleTextViewMath.setText("Math");
-
-		mActionBar.setCustomView(mCustomView);
-		mActionBar.setDisplayShowCustomEnabled(true);
 
 	}
 

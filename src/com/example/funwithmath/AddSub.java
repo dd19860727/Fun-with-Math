@@ -11,6 +11,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.example.funwithmath.util.FactToString;
+import com.example.funwithmath.util.GestureRecognition;
+import com.example.funwithmath.util.MusicController;
+import com.example.funwithmath.util.MusicServer;
+import com.example.funwithmath.util.SpeechListener;
+import com.example.funwithmath.widget.AnimationCheck;
+import com.example.funwithmath.widget.AnimationCross;
+import com.example.funwithmath.widget.ClearableEditText;
+import com.example.funwithmath.widget.CustomActionBar;
+
 import android.R.layout;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -42,8 +52,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+public class AddSub extends Activity {
 
-public class AddSub extends Activity implements RecognitionListener {
+	private CustomActionBar cActionBar;
+	
+	private Button sound;
+	private Intent serviceIntent;
+	private MusicController musiControl;
+	private boolean musicPlayStatus;
+	
+	private Button mic;
+	private SpeechListener speechListener;
 
 	private TextView textFactor1;
 	private TextView textFactor2;
@@ -70,27 +89,21 @@ public class AddSub extends Activity implements RecognitionListener {
 	private TextView correctness;
 	private int right;
 	private int wrong;
+	private DisplayPercent dPercent;
 
 	private ImageView animationCH;
+	private AnimationCheck animationCheck;
 	private ImageView animationCR;
-	private AnimationDrawable animationDrawable;
-
-	private Button sound;
-	private Intent serviceIntent;
-	private boolean musicPlayStatus = true;
+	private AnimationCross animationCross;
 
 	private GestureOverlayView gov;
 	private Gesture gesture;
-	private GestureLibrary gestureLib;
+	private GestureRecognition gRecognition;
 	public static String temp;
-	private String temp1;
-	private Boolean checTemp;
+
 
 	private MediaPlayer mpRight;
 	private MediaPlayer mpWrong;
-
-	private Button mic;
-	private SpeechRecognizer speech;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +111,23 @@ public class AddSub extends Activity implements RecognitionListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sub_main);
 
-		// Initialize
+		// Customize Action Bar
+		cActionBar = new CustomActionBar(getActionBar());
+		cActionBar.initActionBar();
+		cActionBar.cutomLayoutInflater(this);
+		cActionBar.display();
+
+		// Control Background Music
+		sound = (Button) findViewById(R.id.sound);
+		serviceIntent = new Intent(this, MusicServer.class);
+		musiControl = new MusicController(this, serviceIntent);
+		musicPlayStatus = true;
+		
+		// Speaker Icon
+		mic = (Button) findViewById(R.id.voiceRecog);
+		speechListener = new SpeechListener(this, this);
+
+		// Generate Number and Operator
 		textFactor1 = (TextView) findViewById(R.id.factor1);
 		textFactor2 = (TextView) findViewById(R.id.factor2);
 		operator = (TextView) findViewById(R.id.operator);
@@ -106,18 +135,17 @@ public class AddSub extends Activity implements RecognitionListener {
 		input = (ClearableEditText) findViewById(R.id.input);
 
 		animationCH = (ImageView) findViewById(R.id.animationCH);
+		animationCheck = new AnimationCheck();
 		animationCR = (ImageView) findViewById(R.id.animationCR);
+		animationCross = new AnimationCross();
 
 		correctness = (TextView) findViewById(R.id.CorrectPercent);
-
+		dPercent = new DisplayPercent(this);
 		right = 0;
 		wrong = 0;
 
-		// Customize Action Bar
-		initActionBar();
-
 		// Generate Operator
-		op = new OperatorGenerator();
+		op = new OperatorGenerator(1);
 		operatorGen = op.operatorGenerator();
 		operatorGenerator(operatorGen);
 
@@ -131,27 +159,17 @@ public class AddSub extends Activity implements RecognitionListener {
 		sfactArray = new String[numOfArray];
 		factNumToStr();
 
-		sound = (Button) findViewById(R.id.sound);
-		serviceIntent = new Intent(this, MusicServer.class);
-
 		// Correct Wrong Sound Effect
 		mpRight = MediaPlayer.create(getApplicationContext(), R.raw.correct);
 		mpWrong = MediaPlayer.create(getApplicationContext(), R.raw.wrong);
-
-		// Speaker Icon
-		mic = (Button) findViewById(R.id.voiceRecog);
-		speech = SpeechRecognizer.createSpeechRecognizer(this);
-		speech.setRecognitionListener(this);
-
+		
+		gRecognition = new GestureRecognition(this,this,gov);
 		gov = (GestureOverlayView) findViewById(R.id.himi_gesture);
 		gov.setGestureStrokeType(GestureOverlayView.GESTURE_STROKE_TYPE_MULTIPLE);
-		gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
-		checTemp = true;
 
 		// Gesture Recognition
 		gov.addOnGestureListener(new OnGestureListener() {
 			@Override
-
 			public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
 
 			}
@@ -162,11 +180,11 @@ public class AddSub extends Activity implements RecognitionListener {
 				gesture = overlay.getGesture();
 
 				if (event.getAction() == MotionEvent.ACTION_UP) {
-
-					addMyGesture(gesture);
+					
+					gRecognition.addMyGesture(gesture);
 
 					if (gesture.getStrokesCount() == 2) {
-
+						
 						clearGesture();
 
 					}
@@ -182,14 +200,10 @@ public class AddSub extends Activity implements RecognitionListener {
 			@Override
 			public void onGesture(GestureOverlayView overlay, MotionEvent event) {
 			}
+			
 		});
-
-		if (!gestureLib.load()) {
-
-		} else {
-			Set<String> set = gestureLib.getGestureEntries();
-			Object ob[] = set.toArray();
-		}
+		
+		gRecognition.loadGestureLib();
 
 		// Voice Recognition
 		mic.setOnClickListener(new OnClickListener() {
@@ -197,14 +211,16 @@ public class AddSub extends Activity implements RecognitionListener {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-
+				
 				if (musicPlayStatus) {
 					sound.setBackgroundResource(R.drawable.soundclose);
-					stopMyPlaySerive();
+					musiControl.stopMyPlaySerive();
 					musicPlayStatus = false;
 				}
-
-				promptSpeechInput();
+				
+				speechListener.onCreate();
+				speechListener.promptSpeechInput();
+				
 
 			}
 		});
@@ -217,7 +233,14 @@ public class AddSub extends Activity implements RecognitionListener {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 
-				soundStopClick();
+				if (!musicPlayStatus) {
+					musiControl.soundSwitch(sound, musicPlayStatus);
+					musicPlayStatus = true;
+				} else {
+					musiControl.soundSwitch(sound, musicPlayStatus);
+					musicPlayStatus = false;
+				}
+
 			}
 		});
 
@@ -247,6 +270,7 @@ public class AddSub extends Activity implements RecognitionListener {
 				}
 
 				temp = "";
+				input.setText(temp);
 
 			}
 
@@ -260,7 +284,7 @@ public class AddSub extends Activity implements RecognitionListener {
 					if (inputNum == (factor1 - factor2)) {
 
 						// animation of check mark
-						animationCheck();
+						animationCheck.animationCheckmark(animationCH, mpRight);
 
 						input.setText("");
 
@@ -271,18 +295,20 @@ public class AddSub extends Activity implements RecognitionListener {
 
 						right++;
 						// calculate correctness
-						displayPercent();
+						dPercent.disPercent(right, wrong);
+						
 
 					} else {
 
 						// animation of cross mark
-						animationCross();
+						animationCross.animationCrossMark(animationCR, mpWrong);
 
 						input.setText("");
 
 						wrong++;
-
-						displayPercent();
+						
+						dPercent.disPercent(right, wrong);
+						
 
 					}
 
@@ -299,7 +325,7 @@ public class AddSub extends Activity implements RecognitionListener {
 
 					if (inputNum == (factor1 + factor2)) {
 
-						animationCheck();
+						animationCheck.animationCheckmark(animationCH, mpRight);
 
 						input.setText("");
 
@@ -309,68 +335,26 @@ public class AddSub extends Activity implements RecognitionListener {
 						factNumToStr();
 
 						right++;
-
-						displayPercent();
+						
+						dPercent.disPercent(right, wrong);
+						//displayPercent();
 
 					} else {
 
-						animationCross();
+						animationCross.animationCrossMark(animationCR, mpWrong);
 
 						wrong++;
-
-						displayPercent();
+						
+						dPercent.disPercent(right, wrong);
+						
 
 					}
 
 				}
 
 			}
-
-			private void animationCross() {
-				// TODO Auto-generated method stub
-
-				animationCR.setImageResource(R.drawable.animationcr);
-				animationDrawable = (AnimationDrawable) animationCR.getDrawable();
-				animationDrawable.start();
-				mpWrong.start();
-
-			}
-
-			private void animationCheck() {
-				// TODO Auto-generated method stub
-
-				animationCH.setImageResource(R.drawable.animationch);
-				animationDrawable = (AnimationDrawable) animationCH.getDrawable();
-				animationDrawable.start();
-
-				mpRight.start();
-
-			}
-
-			private void displayPercent() {
-				// TODO Auto-generated method stub
-
-				if (wrong == 0 && right == 0) {
-
-					correctness.setText("Start");
-
-				} else if (wrong == 0 && right != 0) {
-
-					correctness.setText("100%");
-
-				} else {
-
-					double dPrecent = (double) right / (wrong + right);
-
-					int precent = ((int) (dPrecent * 100));
-
-					String sprecent = new Integer(precent).toString();
-
-					correctness.setText(sprecent + "%");
-
-				}
-
-			}
+			
+			
 		});
 		Button Reset;
 
@@ -390,19 +374,27 @@ public class AddSub extends Activity implements RecognitionListener {
 		});
 
 	}
-
-	protected void promptSpeechInput() {
+	
+	public void setInputText(String s) {
 		// TODO Auto-generated method stub
-
-		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
-		intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
-
-		speech.startListening(intent);
-
+		
+		input.setText(s);
+		
+	}
+	
+	public void setCorrectText(String s) {
+		// TODO Auto-generated method stub
+		correctness.setText(s);
+	}
+	
+	public void setGesInputText(String s) {
+		// TODO Auto-generated method stub
+		temp = temp + s;
+		temp = temp.replace("null", "");
+		input.setText(temp);
 	}
 
-	protected void clearGesture() {
+	public void clearGesture() {
 		// TODO Auto-generated method stub
 		try {
 			Thread.sleep(300);
@@ -412,128 +404,6 @@ public class AddSub extends Activity implements RecognitionListener {
 		}
 		gov.cancelClearAnimation();
 		gov.clear(true);
-
-	}
-
-	protected void addMyGesture(Gesture gesture2) {
-		// TODO Auto-generated method stub
-		try {
-
-			findGesture(gesture2);
-
-		} catch (Exception e) {
-		}
-	}
-
-	private void findGesture(Gesture gesture2) {
-		// TODO Auto-generated method stub
-
-		try {
-
-			List<Prediction> predictions = gestureLib.recognize(gesture);
-
-			if (!predictions.isEmpty()) {
-				Prediction prediction = predictions.get(0);
-
-				if (prediction.score >= 1) {
-
-					if (prediction.name.equals("10")) {
-
-						temp1 = removSec("1");
-
-					} else if (prediction.name.equals("11")) {
-						temp1 = removSec("8");
-
-					} else if (prediction.name.equals("4")) {
-						temp1 = removSec("4");
-
-					} else if (prediction.name.equals("5")) {
-						temp1 = removSec("5");
-
-					} else {
-						temp1 = prediction.name;
-						clearGesture();
-					}
-
-					temp = temp + temp1;
-					temp = temp.replace("null", "");
-
-					input.setText(temp);
-
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private String removSec(String temp) {
-		// TODO Auto-generated method stub
-
-		if (checTemp == true) {
-			temp = temp;
-			checTemp = false;
-		} else {
-			temp = "";
-			checTemp = true;
-		}
-
-		return temp;
-	}
-
-	private void specialCondition() {
-		// TODO Auto-generated method stub
-
-	}
-
-	protected void soundStopClick() {
-		// TODO Auto-generated method stub
-		if (!musicPlayStatus) {
-			sound.setBackgroundResource(R.drawable.soundopen);
-			playAudio();
-			musicPlayStatus = true;
-		} else {
-			sound.setBackgroundResource(R.drawable.soundclose);
-			stopMyPlaySerive();
-			musicPlayStatus = false;
-		}
-	}
-
-	private void stopMyPlaySerive() {
-		// TODO Auto-generated method stub
-		stopService(serviceIntent);
-		musicPlayStatus = false;
-	}
-
-	private void playAudio() {
-		// TODO Auto-generated method stub
-		startService(serviceIntent);
-		musicPlayStatus = true;
-
-	}
-
-	private void initActionBar() {
-		// TODO Auto-generated method stub
-
-		ActionBar mActionBar = getActionBar();
-		mActionBar.setDisplayShowHomeEnabled(false);
-		mActionBar.setDisplayShowTitleEnabled(false);
-		LayoutInflater mInflater = LayoutInflater.from(this);
-
-		View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-		TextView mTitleTextViewFun = (TextView) mCustomView.findViewById(R.id.title_textFun);
-		mTitleTextViewFun.setText("Fun");
-
-		TextView mTitleTextViewWith = (TextView) mCustomView.findViewById(R.id.title_textWith);
-		mTitleTextViewWith.setText("with");
-
-		TextView mTitleTextViewMath = (TextView) mCustomView.findViewById(R.id.title_textMath);
-		mTitleTextViewMath.setText("Math");
-
-		mActionBar.setCustomView(mCustomView);
-		mActionBar.setDisplayShowCustomEnabled(true);
 
 	}
 
@@ -570,67 +440,6 @@ public class AddSub extends Activity implements RecognitionListener {
 		factArray = gM.generateNum(factor1, factor2, operatorGen);
 		factor1 = factArray[0];
 		factor2 = factArray[1];
-
-	}
-
-	@Override
-	public void onReadyForSpeech(Bundle params) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onBeginningOfSpeech() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onRmsChanged(float rmsdB) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onBufferReceived(byte[] buffer) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onEndOfSpeech() {
-		// TODO Auto-generated method stub
-		Toast.makeText(getApplicationContext(),
-				getString(R.string.end_of_speech),
-				Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onError(int error) {
-		// TODO Auto-generated method stub
-		
-		
-
-	}
-
-	@Override
-	public void onResults(Bundle data) {
-		// TODO Auto-generated method stub
-
-		ArrayList<String> result = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-		input.setText(result.get(0));
-
-	}
-
-	@Override
-	public void onPartialResults(Bundle partialResults) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onEvent(int eventType, Bundle params) {
-		// TODO Auto-generated method stub
 
 	}
 
